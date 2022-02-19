@@ -1,4 +1,6 @@
 <?php
+require_once 'Database1.php';
+
 if(isset($_POST['userInscription']))
 {
     $userFirstNameS = isset($_POST['userFirstName']);
@@ -30,6 +32,32 @@ if(isset($_POST['userInscription']))
 
         if($userPassWord !== $userPassWordConfirmation)
             echo "Les mots de passes ne correspondent pas";
+        else
+        {
+            $request = $PDO1->prepare('INSERT INTO auth_users(user_firstname, user_lastname, user_mail, user_pseudo, user_password) VALUES (:param1, :param2, :param3, :param4, :param5)');
+            $monTableau = 
+            [
+                'param1' => $userFirstName,
+                'param2' => $userLastName,
+                'param3' => $userMail,
+                'param4' => $userPseudo,
+                'param5' => password_hash($userPassWord, PASSWORD_BCRYPT)
+            ];
+            $request->execute($monTableau);
+    
+            $requestGet = $PDO1->prepare('SELECT * FROM auth_users WHERE user_firstname = :my_name');
+            $requestGet->bindValue(":my_name", $userFirstName);
+            $requestGet->execute();
+
+            // $listUsers = $requestGet->fetch(PDO::FETCH_ASSOC);
+            // if($listUsers)
+            // {
+            //     echo '<pre>';
+            //     print_r($listUsers);
+            //     echo '</pre>';
+            // }
+
+        }
 
     }
 }
